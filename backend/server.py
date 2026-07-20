@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from helpers.limiter import limiter
 from contextlib import asynccontextmanager
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -12,11 +13,12 @@ load_dotenv()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Do nothing here just yet 
+    # Do nothing here just yet
+    # Add the database logic here  
     yield 
 
 app = FastAPI(lifespan=lifespan)
-# Add limiter logic here 
+app.state.limiter = limiter 
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
@@ -42,6 +44,5 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
-    
 
-
+# Add a health check endpoint later 
